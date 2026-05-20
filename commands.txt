@@ -1,0 +1,54 @@
+Create .env file at root and add below contents
+
+------------- COPY -------------
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
+OPENAI_API_KEY=<OPENAI_API_KEY>
+
+LANGCHAIN_TRACING_V2=true
+LANGSMITH_API_KEY=<LANGSMITH_API_KEY>
+LANGSMITH_PROJECT=cka
+
+DATA_DIR=data
+RETRIEVAL_K=5
+
+CO_API_KEY=<CO_API_KEY>
+REDIS_URL=redis://cka-redis:6379/0
+------------- COPY -------------
+
+
+
+VS Code Terminal (PowerShell):
+-----------------------------
+cd D:\dev\github\agentic-ai-company-knowledge-assistant
+python -m venv venv311
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+venv311\Scripts\activate
+
+python -m pip --version
+(venv311) PS D:\dev\github\agentic-ai-company-knowledge-assistant> python -m pip --version                                   
+pip 22.3 from D:\dev\github\agentic-ai-company-knowledge-assistant\venv311\Lib\site-packages\pip (python 3.11)
+
+pip install -r requirements.txt
+
+Changes:
+--------
+docker-compose.yml
+Change port from "5432:5432" to "5433:5432", because DBeaver will connect to 'Postgres' installed in windows machine instead of docker container
+
+Git Bash:
+---------
+Start Docker Desktop
+cd D:/dev/github/agentic-ai-company-knowledge-assistant
+docker compose build
+docker compose up
+
+URL:
+---
+http://localhost:8000
+
+
+
+Remove chunks:
+-------------
+docker compose down -v
+docker compose up
