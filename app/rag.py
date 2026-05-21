@@ -63,16 +63,9 @@ async def _build_chain(category: str = None):
     if category:
         search_kwargs["filter"]={"category":category}
     retriever = store.as_retriever(search_kwargs=search_kwargs)
-    llm = ChatOpenAI(model="gpt-5-nano")
-    doc_chain = create_stuff_documents_chain(llm, PROMPT)
-    rag_chain = create_retrieval_chain(retriever, doc_chain)
-    return rag_chain
-
 ## Unable to Signup for Cohere re-ranking to get API key. So, use above code without re-ranking
-## Using standard vector retriever for now.
-# async def _build_chain():
-#     store = await get_vector_store()
-#     base_retriever = store.as_retriever(search_kwargs={"k":int(os.getenv("RETRIEVAL_K", 5))})
+## Using standard vector retriever for now.    
+#     base_retriever = store.as_retriever(search_kwargs=search_kwargs)
 #     compressor = CohereRerank(
 #         top_n = 3,
 #         model = "rerank-multilingual-v3.0"
@@ -80,11 +73,11 @@ async def _build_chain(category: str = None):
 #     retriever = ContextualCompressionRetriever(
 #         base_retriever=base_retriever,
 #         base_compressor=compressor
-#     )
-#     llm = ChatOpenAI(model="gpt-5-nano")
-#     doc_chain = create_stuff_documents_chain(llm, PROMPT)
-#     rag_chain = create_retrieval_chain(retriever, doc_chain)
-#     return rag_chain
+#     )    
+    llm = ChatOpenAI(model="gpt-5-nano")
+    doc_chain = create_stuff_documents_chain(llm, PROMPT)
+    rag_chain = create_retrieval_chain(retriever, doc_chain)    # use 'base_retriever' if using CohereRerank
+    return rag_chain
 
 async def answer_with_docs_async(question: str, category: str) -> Tuple[str, List[str],List[str]]:
     chain = await _build_chain(category)

@@ -34,3 +34,9 @@ langchain-cohere
 
 #Evals
 ragas
+
+#mcp
+mcp
+langchain_mcp_adapters
+streamlit
+langgraph
