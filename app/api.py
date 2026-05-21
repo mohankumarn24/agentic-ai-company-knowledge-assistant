@@ -79,13 +79,20 @@ async def ask(q: Ask):
     
     
 ## Run
+# Start Docker Desktop"
+#   Launch Bash terminal
+#   cd D:/dev/github/agentic-ai-company-knowledge-assistant
+#   docker compose build
+#   docker compose up
+#
 # See Commands.txt
 #   docker compose down -v
 #   docker compose up
 #   docker restart cka-app
 #
-# Launch http://localhost:8000 in incognito mode
-# Ingest data and ask questions from rag_questions.pdf
+# http://localhost:8000
+#   Launch url in incognito mode
+#   Ingest data and ask questions from rag_questions.pdf
 #
 # Q: What are the critical DNS records required when setting up a business email domain, and what purpose does each serve?
 # A: MX (Mail Exchange): Directs...
@@ -97,5 +104,3 @@ async def ask(q: Ask):
 #    SOURCES:
 #    data/guides/email-setup.docx
 #    data/guides/jira-guide.pdf
-
-
