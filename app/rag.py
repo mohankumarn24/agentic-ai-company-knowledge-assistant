@@ -51,14 +51,38 @@ async def _build_chain():
     rag_chain = create_retrieval_chain(retriever, doc_chain)
     return rag_chain
 
-async def answer_with_docs_async(question: str) -> Tuple[str, List[str]]:
+## Unable to Signup for Cohere re-ranking to get API key. So, use above code without re-ranking
+## Using standard vector retriever for now.
+# async def _build_chain():
+#     store = await get_vector_store()
+#     base_retriever = store.as_retriever(search_kwargs={"k":int(os.getenv("RETRIEVAL_K", 5))})
+#     compressor = CohereRerank(
+#         top_n = 3,
+#         model = "rerank-multilingual-v3.0"
+#     )
+#     retriever = ContextualCompressionRetriever(
+#         base_retriever=base_retriever,
+#         base_compressor=compressor
+#     )
+#     llm = ChatOpenAI(model="gpt-5-nano")
+#     doc_chain = create_stuff_documents_chain(llm, PROMPT)
+#     rag_chain = create_retrieval_chain(retriever, doc_chain)
+#     return rag_chain
+
+async def answer_with_docs_async(question: str) -> Tuple[str, List[str],List[str]]:
     chain = await _build_chain()
-    result = await chain.ainvoke({"input":question})
-    answer = result["answer"]
+    result = await chain.ainvoke({"input": question})
+    answer: str = result["answer"]
+
+    docs: List[Document] = result["context"]
     
-    sources = []
-    docs:List[Document] = result["context"]
-    unique_sources = {d.metadata.get("source") for d in docs}
+    unique_sources = {d.metadata.get("source") for d in docs if d.metadata.get("source")}
     sources = sorted(unique_sources)
-    
-    return answer, sources
+
+    contexts = []
+    for d in docs:
+        contexts.append(d.page_content)
+
+
+    return answer, sources, contexts
+

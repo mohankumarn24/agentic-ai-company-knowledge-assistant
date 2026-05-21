@@ -9,6 +9,7 @@ from langchain_openai import ChatOpenAI
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall
 from ragas.run_config import RunConfig
 
+# oai_llm = ChatOpenAI(model="gpt-5-nano")  # Unsupported value: 'temperature' does not support 0.01 with this model. Only the default (1) value is supported.
 oai_llm = ChatOpenAI(model="gpt-4o-mini")
 
 def load_jsonl(path):
@@ -45,8 +46,44 @@ async def evaluate_rag_system(test_path="../seed/qna_test.json"):
         answer, contexts = res['answer'], res['contexts']
 
         #TODO
-       
+        results.append(SingleTurnSample(
+            user_input = question,
+            response = answer,
+            retrieved_contexts = contexts,
+            reference = reference_answer
+        ))
+
+    ds = EvaluationDataset(results)
+    metrics = [faithfulness,answer_relevancy,context_precision,context_recall]
+    run_config = RunConfig(max_workers=16,timeout = 30)
+    eval_result = evaluate(dataset=ds,metrics=metrics,llm=oai_llm,run_config=run_config)
+    print("RAGAS Evals Results")
+    print_eval_res(eval_result)
         
 
 if __name__ == "__main__":
     asyncio.run(evaluate_rag_system())
+
+
+## Run:
+# docker compose down -v
+# docker compose up
+#
+# Ingest Data from UI first
+#
+# cd D:\dev\github\agentic-ai-company-knowledge-assistant\app
+# python .\eval_ragas.py
+
+## TODO:
+#  1. Couldn't see logs in LangSmith
+#     cka > ragas evaluation
+#
+#  2. Couldn't use CohereRerank in rag.py (_build_chain() method) as I couldn't sign-up for an API key. 
+#     Using standard vector retriever for now.
+#     Try other free alternatives - Jina, Flashrank, etc
+
+
+## RAGAS Evals Results:
+#  | Q | faithfulness | answer_relevancy      | context_precision  | context_recall | 
+#  | 1 | 0.0          | 0.7558001814161309    | 0.3333333333       | 1.0            |    --> 'context_precision' value may improve with re-ranking
+#  | 2 | 0.0          | 0.733957425616106     | 0.9999999999666667 | 1.0            | 
