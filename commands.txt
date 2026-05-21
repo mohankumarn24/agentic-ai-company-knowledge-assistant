@@ -52,3 +52,15 @@ Remove chunks:
 -------------
 docker compose down -v
 docker compose up
+docker restart cka-app
+
+
+| What changed?                    | Command                                                   |
+| -------------------------------- | --------------------------------------------------------- |
+| Normal Python code               | docker compose up                                         |
+| Normal Python code, app stuck    | docker restart cka-app                                    |
+| requirements.txt changed         | docker compose up --build                                 |
+| Dockerfile changed               | docker compose up --build                                 |
+| Want to wipe DB also             | docker compose down -v then docker compose up --build     |
+| Just restart containers, keep DB | docker compose down then docker compose up                |
+

@@ -39,13 +39,30 @@ set_llm_cache(
     RedisSemanticCache(
         redis_url=REDIS_URL,
         embeddings=embeddings,
-        distance_threshold=0.98
+        distance_threshold=0.05
+        # distance_threshold=0.98
+        # - 0.98 is too loose / too high-risk for a RAG app with different categories. 
+        #   Similar-looking prompts can reuse the previous LLM answer/cache even when retrieved docs changed
+        # - Also, LangChain LLM cache usually keys around the final LLM prompt, not your API route. 
+        #   If two prompts are semantically close enough, RedisSemanticCache may return old answer.
+        
+        # Q. What are the critical DNS records required when setting up a business email domain, and what purpose does each serve?
+        # A. MX (Mail Exchange): Directs email delivery...
+        #    Searches guide folder and gets result
+        
+        # Q. What are the number of PTOs for a full time employee?
+        # A. I don't know
+        #    If 'distance_threshold=0.0.05', searches guide folder, but no matching result. So, returns 'I don't know'. 
+        #    If 'distance_threshold=0.98', then it may return cached data. So, returns 'MX (Mail Exchange): Directs email delivery...'
     )
 )
 
-async def _build_chain():
+async def _build_chain(category: str = None):
     store = await get_vector_store()
-    retriever = store.as_retriever(search_kwargs={"k":int(os.getenv("RETRIEVAL_K", 5))})
+    search_kwargs={"k":int(os.getenv("RETRIEVAL_K", 5))}
+    if category:
+        search_kwargs["filter"]={"category":category}
+    retriever = store.as_retriever(search_kwargs=search_kwargs)
     llm = ChatOpenAI(model="gpt-5-nano")
     doc_chain = create_stuff_documents_chain(llm, PROMPT)
     rag_chain = create_retrieval_chain(retriever, doc_chain)
@@ -69,8 +86,8 @@ async def _build_chain():
 #     rag_chain = create_retrieval_chain(retriever, doc_chain)
 #     return rag_chain
 
-async def answer_with_docs_async(question: str) -> Tuple[str, List[str],List[str]]:
-    chain = await _build_chain()
+async def answer_with_docs_async(question: str, category: str) -> Tuple[str, List[str],List[str]]:
+    chain = await _build_chain(category)
     result = await chain.ainvoke({"input": question})
     answer: str = result["answer"]
 
