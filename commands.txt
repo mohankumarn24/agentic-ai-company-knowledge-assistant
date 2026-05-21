@@ -54,6 +54,11 @@ docker compose down -v
 docker compose up
 docker restart cka-app
 
+Free up space:
+-------------
+docker system df                -> show docker disk usage summary
+docker builder prune -a         -> deletes ONLY docker build cache
+
 
 | What changed?                    | Command                                                   |
 | -------------------------------- | --------------------------------------------------------- |
