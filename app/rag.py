@@ -63,9 +63,18 @@ async def _build_chain(category: str = None):
     if category:
         search_kwargs["filter"]={"category":category}
     retriever = store.as_retriever(search_kwargs=search_kwargs)
+#     base_retriever = store.as_retriever(search_kwargs=search_kwargs)
+#     compressor = CohereRerank(
+#         top_n = 3,
+#         model = "rerank-multilingual-v3.0"
+#     )
+#     retriever = ContextualCompressionRetriever(
+#         base_retriever=base_retriever,
+#         base_compressor=compressor
+#     )     
     llm = ChatOpenAI(model="gpt-5-nano")
     doc_chain = create_stuff_documents_chain(llm, PROMPT)
-    rag_chain = create_retrieval_chain(retriever, doc_chain)
+    rag_chain = create_retrieval_chain(retriever, doc_chain)        # use 'base_retriever' if using CohereRerank
     return rag_chain
 
 ## Unable to Signup for Cohere re-ranking to get API key. So, use above code without re-ranking

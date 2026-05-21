@@ -39,7 +39,7 @@ async def _ingest_job():
     _ingest_last.update({"status": "running", "started_at": time.time(), "finished_at": None, "stats": None, "error": None})
     try:
         #TODO: RUN INGESTION
-        stats = await run_ingest_async()
+        stats = None
 
         _ingest_last.update({"status": "succeeded", "finished_at": time.time(), "stats": stats})
     except Exception as e:
@@ -52,7 +52,6 @@ async def kick_off_ingest():
         if _ingest_task and not _ingest_task.done():
             return JSONResponse({"ok": False, "message": "Ingestion already running"}, status_code=409)
         #TODO: Create Ingestion Task
-        _ingest_task = asyncio.create_task(_ingest_job())
     return {"ok": True, "message": "Ingestion started"}
 
 @app.get("/ingest/status")
@@ -64,38 +63,11 @@ async def ask(q: Ask):
     start = time.perf_counter()
     
     #TODO: Call RAG
-    category="guides"    
-        
-    answer, sources, contexts = await answer_with_docs_async(q.question, category)
+   
     
+
     elapsed = time.perf_counter() - start
     print(f"⏱️ /ask execution took {elapsed:.2f} seconds")
     
-    return {
-        "answer": answer,         
-        "sources": sources,
-        "contexts":contexts
-    }
-    
-    
-## Run
-# See Commands.txt
-#   docker compose down -v
-#   docker compose up
-#   docker restart cka-app
-#
-# Launch http://localhost:8000 in incognito mode
-# Ingest data and ask questions from rag_questions.pdf
-#
-# Q: What are the critical DNS records required when setting up a business email domain, and what purpose does each serve?
-# A: MX (Mail Exchange): Directs...
-#    SOURCES:
-#    data/guides/email-setup.docx
-#   
-# Q: What are the number of PTOs for a full time employee?
-# A: I don't know.
-#    SOURCES:
-#    data/guides/email-setup.docx
-#    data/guides/jira-guide.pdf
 
-
+    

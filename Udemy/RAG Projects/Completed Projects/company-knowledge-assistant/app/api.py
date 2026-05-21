@@ -64,38 +64,16 @@ async def ask(q: Ask):
     start = time.perf_counter()
     
     #TODO: Call RAG
-    category="guides"    
-        
-    answer, sources, contexts = await answer_with_docs_async(q.question, category)
-    
+    category = "guides"
+   
+    answer, sources , contexts = await answer_with_docs_async(q.question,category)
+
     elapsed = time.perf_counter() - start
     print(f"⏱️ /ask execution took {elapsed:.2f} seconds")
     
+
     return {
         "answer": answer,         
         "sources": sources,
         "contexts":contexts
     }
-    
-    
-## Run
-# See Commands.txt
-#   docker compose down -v
-#   docker compose up
-#   docker restart cka-app
-#
-# Launch http://localhost:8000 in incognito mode
-# Ingest data and ask questions from rag_questions.pdf
-#
-# Q: What are the critical DNS records required when setting up a business email domain, and what purpose does each serve?
-# A: MX (Mail Exchange): Directs...
-#    SOURCES:
-#    data/guides/email-setup.docx
-#   
-# Q: What are the number of PTOs for a full time employee?
-# A: I don't know.
-#    SOURCES:
-#    data/guides/email-setup.docx
-#    data/guides/jira-guide.pdf
-
-
